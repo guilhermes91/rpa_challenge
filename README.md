@@ -35,9 +35,9 @@ docker cp rpa-challenge:/app/certs/client.pfx . && \
 openssl pkcs12 -in client.pfx -clcerts -nokeys -out client_cert.pem -password pass:test123 && \
 openssl pkcs12 -in client.pfx -nocerts -nodes -out client_key.pem -password pass:test123 && \
 docker build -t rpa-solver-bot . && \
-docker run --rm -it rpa-solver-bot
+docker run --rm -it --add-host=host.docker.internal:host-gateway rpa-solver-bot
 ```
-*(Nota: O Docker usará nossa configuração padrão com `--mode native`. Caso queira acionar a versão de simulação de clique Playwright, mude a última linha para `docker run --rm -it rpa-solver-bot --level all --mode playwright --headless`.)*
+*(Nota: O Docker usará nossa configuração padrão com `--mode native`. Caso queira acionar a versão de simulação de clique Playwright, mude a última linha para `docker run --rm -it --add-host=host.docker.internal:host-gateway rpa-solver-bot --level all --mode playwright --headless`.)*
 
 ---
 
