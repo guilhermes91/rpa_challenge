@@ -121,6 +121,11 @@ class NativeHardSolver(RpaSolver):
             redirect_url = data1.get("redirect", "")
             if redirect_url.startswith("/"):
                 redirect_url = f"{self.config.base_url}{redirect_url}"
+            else:
+                p_redir = urlparse(redirect_url)
+                if p_redir.hostname in ['localhost', '127.0.0.1']:
+                    b_host = urlparse(self.config.base_url).hostname
+                    redirect_url = p_redir._replace(netloc=f"{b_host}:{p_redir.port or 3001}").geturl()
                 
             parsed = urlparse(redirect_url)
             token = parse_qs(parsed.query).get("token", [""])[0]
