@@ -39,9 +39,33 @@ class Mode(str, Enum):
     NATIVE = "native"
     PLAYWRIGHT = "playwright"
 
+def _resolve_base_url() -> str:
+    url = os.getenv("RPA_URL", "https://localhost:3000")
+    if "host.docker.internal" in url:
+        if not os.path.exists("/.dockerenv"):
+            url = url.replace("host.docker.internal", "localhost")
+        else:
+            import socket
+            try:
+                socket.gethostbyname("host.docker.internal")
+            except socket.gaierror:
+                fallback_ip = "172.17.0.1"
+                try:
+                    with open("/proc/net/route") as f:
+                        for line in f.readlines()[1:]:
+                            fields = line.strip().split()
+                            if fields[1] == '00000000':
+                                gw = fields[2]
+                                fallback_ip = ".".join(str(int(gw[i:i+2], 16)) for i in range(6, -1, -2))
+                                break
+                except Exception:
+                    pass
+                url = url.replace("host.docker.internal", fallback_ip)
+    return url
+
 @dataclass(frozen=True)
 class ChallengeConfig:
-    base_url: str = os.getenv("RPA_URL", "https://localhost:3000")
+    base_url: str = _resolve_base_url()
     base_dir: Path = Path(__file__).parent.resolve()
 
 class SecurityUtils:
@@ -122,10 +146,10 @@ class NativeHardSolver(RpaSolver):
             if redirect_url.startswith("/"):
                 redirect_url = f"{self.config.base_url}{redirect_url}"
             else:
-                p_redir = urlparse(redirect_url)
-                if p_redir.hostname in ['localhost', '127.0.0.1']:
-                    b_host = urlparse(self.config.base_url).hostname
-                    redirect_url = p_redir._replace(netloc=f"{b_host}:{p_redir.port or 3001}").geturl()
+                base_host = urlparse(self.config.base_url).hostname
+                r_parsed = urlparse(redirect_url)
+                if r_parsed.hostname in ("localhost", "127.0.0.1") and base_host:
+                    redirect_url = redirect_url.replace(f"://{r_parsed.hostname}", f"://{base_host}", 1)
                 
             parsed = urlparse(redirect_url)
             token = parse_qs(parsed.query).get("token", [""])[0]
