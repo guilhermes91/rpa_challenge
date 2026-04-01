@@ -149,6 +149,8 @@ A estrutura projetada em `rpa_solver.py` expõe um padrão isolado *Factory* de 
 [EXTREME] Fim:    14:22:37.114
 [EXTREME] Duração: 39276.32 ms
     message: ✅ Autenticado! (35729ms)
+    
+[ALL] Tempo Total Combinado: 47150.91 ms
 ```
 
 ---
