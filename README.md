@@ -128,7 +128,6 @@ A estrutura projetada em `rpa_solver.py` expõe um padrão isolado *Factory* de 
 
 **Execução Módulo Playwright (Simulação Browser Visual):**
 ```text
-(venv) PS C:\Users\guilh\OneDrive\Documents\GitHub\rpa_challenge_final> python rpa_solver.py --level all --mode playwright
 [*] ENGINE INICIADA
     ALVO: ALL
     MODO: PLAYWRIGHT
